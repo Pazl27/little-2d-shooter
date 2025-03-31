@@ -1,7 +1,8 @@
-#include "client/client.hpp"
-#include "server/server.hpp"
 #include <iostream>
 #include <string>
+
+#include "client/client.hpp"
+#include "server/server.hpp"
 
 int main() {
     std::string choice;
