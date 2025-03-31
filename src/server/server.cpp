@@ -40,8 +40,7 @@ void runServer() {
 
                     // Echo the message back to the client
                     ENetPacket *packet =
-                        enet_packet_create("Hello from server!", strlen("Hello from server!") + 1,
-                                           ENET_PACKET_FLAG_RELIABLE);
+                        enet_packet_create("Hello from server!", strlen("Hello from server!") + 1, ENET_PACKET_FLAG_RELIABLE);
                     enet_peer_send(event.peer, 0, packet);
                     break;
                 }
