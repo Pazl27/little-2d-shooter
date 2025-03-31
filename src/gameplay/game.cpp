@@ -14,6 +14,7 @@ Game::Game() : isRunning(false) {
 }
 
 Game::~Game() {
+    players.clear();
     CloseWindow();
 }
 
