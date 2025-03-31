@@ -4,7 +4,7 @@
 
 #include <string>
 
-#include "../constants.hpp"
+#include "constants.hpp"
 
 Game::Game() : isRunning(false) {
     InitWindow(Constants::SCREEN_WIDTH, Constants::SCREEN_HEIGHT, windowTitle.c_str());

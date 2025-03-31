@@ -4,7 +4,7 @@
 
 #include <iostream>
 
-#include "../../constants.hpp"
+#include "../core/constants.hpp"
 
 Player::Player(int spd, Color clr, int rad, PlayerShape shp) {
     position = {Constants::SCREEN_WIDTH / 2, Constants::SCREEN_HEIGHT / 2};

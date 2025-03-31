@@ -3,9 +3,9 @@
 #include <iostream>
 #include <string>
 
-#include "game/game.hpp"
-#include "multiplayer/client/client.hpp"
-#include "multiplayer/server/server.hpp"
+#include "core/game.hpp"
+#include "network/client/client.hpp"
+#include "network/server/server.hpp"
 
 int main() {
     // std::string choice;

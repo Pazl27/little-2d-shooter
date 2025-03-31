@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 
-#include "character/player.hpp"
+#include "../entities/player.hpp"
 
 class Game {
    public:
