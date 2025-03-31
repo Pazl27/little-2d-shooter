@@ -19,8 +19,8 @@ file(GLOB_RECURSE SOURCE_FILES
 
 # Add all Header Files (now in the 'include' directory)
 file(GLOB_RECURSE HEADER_FILES
-    ${CMAKE_SOURCE_DIR}/include/*.h
-    ${CMAKE_SOURCE_DIR}/include/*.hpp
+    ${CMAKE_SOURCE_DIR}/src/*.h
+    ${CMAKE_SOURCE_DIR}/src/*.hpp
 )
 
 # Add the executable

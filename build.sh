@@ -1,6 +1,7 @@
 #!/bin/bash
 
 OUTPUT_DIR="build"
+TARGET_NAME="2d-shooter"
 
 build() {
     if [ ! -d $OUTPUT_DIR ]; then
@@ -22,7 +23,7 @@ release() {
 
 run() {
     build
-    ./debug/Raytracing
+    ./debug/$TARGET_NAME
 }
 
 if [ "$1" == "run" ]; then
