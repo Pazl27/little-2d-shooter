@@ -1,6 +1,8 @@
 #include "server.hpp"
-#include <cstring>
+
 #include <enet/enet.h>
+
+#include <cstring>
 #include <iostream>
 
 void runServer() {

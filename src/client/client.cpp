@@ -1,7 +1,9 @@
 #include "client.hpp"
+
 #include <enet/enet.h>
-#include <iostream>
+
 #include <cstring>
+#include <iostream>
 
 void runClient() {
     if (enet_initialize() != 0) {
