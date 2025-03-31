@@ -16,7 +16,6 @@ int main() {
         std::cerr << "Invalid choice. Please enter 'server' or 'client'." << std::endl;
         return EXIT_FAILURE;
     }
-    std::cout << "fromat test";
 
     return EXIT_SUCCESS;
 }
