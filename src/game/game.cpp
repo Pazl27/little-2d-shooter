@@ -4,10 +4,13 @@
 
 #include <string>
 
+#include "../constants.hpp"
+
 Game::Game() : isRunning(false) {
-    InitWindow(screenWidth, screenHeight, windowTitle.c_str());
+    InitWindow(Constants::SCREEN_WIDTH, Constants::SCREEN_HEIGHT, windowTitle.c_str());
     SetTargetFPS(60);
-    players.push_back(Player());
+    Player player(5, BLUE, 10, PlayerShape::CIRCLE);
+    players.push_back(player);
 }
 
 Game::~Game() {

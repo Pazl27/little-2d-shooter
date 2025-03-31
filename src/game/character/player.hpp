@@ -1,7 +1,14 @@
 #ifndef PLAYER_HPP
 #define PLAYER_HPP
 
+#include <raylib.h>
+
 #include "character.hpp"
+
+enum class PlayerShape {
+    CIRCLE,
+    SQUARE,
+};
 
 struct Position {
     int x;
@@ -10,7 +17,7 @@ struct Position {
 
 class Player : public Character {
    public:
-    Player();
+    Player(int spd, Color clr, int rad, PlayerShape shp);
     ~Player() override;
 
     void move() override;
@@ -22,6 +29,9 @@ class Player : public Character {
 
     Position position;
     int speed;
+    int radius;
+    Color color;
+    PlayerShape shape;
 };
 
 #endif

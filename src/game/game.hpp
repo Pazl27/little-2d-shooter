@@ -17,8 +17,6 @@ class Game {
 
    private:
     bool isRunning;
-    const int screenWidth = 800;
-    const int screenHeight = 600;
     const std::string windowTitle = "2d-shooter";
     std::vector<Player> players;
 };

@@ -4,10 +4,14 @@
 
 #include <iostream>
 
-Player::Player() {
-    position.x = 0;
-    position.y = 0;
-    speed = 5;
+#include "../../constants.hpp"
+
+Player::Player(int spd, Color clr, int rad, PlayerShape shp) {
+    position = {Constants::SCREEN_WIDTH / 2, Constants::SCREEN_HEIGHT / 2};
+    speed = spd;
+    color = clr;
+    radius = rad;
+    shape = shp;
 }
 
 Player::~Player() {
@@ -25,7 +29,11 @@ void Player::attack() {
 }
 
 void Player::draw() {
-    DrawCircle(position.x, position.y, 10, RED);
+    if (shape == PlayerShape::CIRCLE) {
+        DrawCircle(position.x, position.y, radius, color);
+    } else if (shape == PlayerShape::SQUARE) {
+        DrawRectangle(position.x - radius, position.y - radius, radius * 2, radius * 2, color);
+    }
 }
 
 Position Player::getInput() const {
