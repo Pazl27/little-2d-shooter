@@ -1,12 +1,12 @@
 #!/bin/bash
 
-OUTPUT_DIR="target"
+OUTPUT_DIR="build"
 
 build() {
     if [ ! -d $OUTPUT_DIR ]; then
         mkdir $OUTPUT_DIR
     fi
-    cd target
+    cd $OUTPUT_DIR
     cmake -DCMAKE_BUILD_TYPE=Debug ..
     cmake --build . --config Debug
 }
