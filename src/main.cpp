@@ -4,19 +4,19 @@
 #include <string>
 
 int main() {
-  std::string choice;
-  std::cout << "Enter 'server' to run as server or 'client' to run as client: ";
-  std::cin >> choice;
+    std::string choice;
+    std::cout << "Enter 'server' to run as server or 'client' to run as client: ";
+    std::cin >> choice;
 
-  if (choice == "server") {
-    runServer();
-  } else if (choice == "client") {
-    runClient();
-  } else {
-    std::cerr << "Invalid choice. Please enter 'server' or 'client'."
-              << std::endl;
-    return EXIT_FAILURE;
-  }
+    if (choice == "server") {
+        runServer();
+    } else if (choice == "client") {
+        runClient();
+    } else {
+        std::cerr << "Invalid choice. Please enter 'server' or 'client'." << std::endl;
+        return EXIT_FAILURE;
+    }
+    std::cout << "fromat test";
 
-  return EXIT_SUCCESS;
+    return EXIT_SUCCESS;
 }
