@@ -19,9 +19,14 @@ Player::~Player() {
 }
 
 void Player::move() {
-    const Position input = getInput();
-    position.x += input.x * speed;
-    position.y += input.y * speed;
+    Position input = getInput();
+
+    Position newPos = {position.x + input.x * speed, position.y + input.y * speed};
+
+    newPos.x = std::max(radius, std::min(newPos.x, Constants::SCREEN_WIDTH - radius));
+    newPos.y = std::max(radius, std::min(newPos.y, Constants::SCREEN_HEIGHT - radius));
+
+    position = newPos;
 }
 
 void Player::attack() {
