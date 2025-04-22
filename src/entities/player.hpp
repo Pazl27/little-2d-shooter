@@ -3,16 +3,15 @@
 
 #include <raylib.h>
 
-#include "character.hpp"
+#include <vector>
+
+#include "entities/bullet.hpp"
+#include "entities/character.hpp"
+#include "entities/position.hpp"
 
 enum class PlayerShape {
     CIRCLE,
     SQUARE,
-};
-
-struct Position {
-    int x;
-    int y;
 };
 
 class Player : public Character {
@@ -27,14 +26,25 @@ class Player : public Character {
     Position getPosition() const;
     void setPosition(Position newPos);
 
+    void shoot();
+    void updateBullets();
+    void drawBullets() const;
+    const std::vector<Bullet>& getBullets() const;
+
    protected:
-    Position getInput() const;
+    Position getInput();
 
     Position position;
     int speed;
     int radius;
     Color color;
     PlayerShape shape;
+
+    Position lastDirection;
+    float shootCooldown;
+    float timeSinceLastShot;
+
+    std::vector<Bullet> bullets;
 };
 
 #endif

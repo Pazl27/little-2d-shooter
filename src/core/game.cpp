@@ -5,7 +5,7 @@
 #include <stdexcept>
 #include <string>
 
-#include "constants.hpp"
+#include "core/constants.hpp"
 #include "network/network_manager.hpp"
 
 Game::Game(bool hostFlag) : isRunning(false), isHost(hostFlag) {
@@ -52,7 +52,10 @@ void Game::start() {
             players[remoteIndex].setPosition({static_cast<int>(rx), static_cast<int>(ry)});
         }
 
-        // Draw both players
+        // === UPDATE BULLETS for both players ===
+        players[localIndex].updateBullets();
+
+        // === DRAW players (which also draws bullets) ===
         for (auto& player : players) {
             player.draw();
         }
