@@ -4,8 +4,8 @@
 #include <string>
 #include <vector>
 
-#include "../entities/player.hpp"
-#include "../network/network_manager.hpp"
+#include "entities/player.hpp"
+#include "network/network_manager.hpp"
 
 class Game {
    public:

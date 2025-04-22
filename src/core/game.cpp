@@ -5,8 +5,8 @@
 #include <stdexcept>
 #include <string>
 
-#include "../network/network_manager.hpp"
 #include "constants.hpp"
+#include "network/network_manager.hpp"
 
 Game::Game(bool hostFlag) : isRunning(false), isHost(hostFlag) {
     InitWindow(Constants::SCREEN_WIDTH, Constants::SCREEN_HEIGHT, windowTitle.c_str());

@@ -42,7 +42,7 @@ add_subdirectory(${ENET_ROOT_DIR})
 
 # Add the Include Directories for the Libraries / Files
 target_include_directories(${PROJECT_NAME}
-    PUBLIC ${CMAKE_SOURCE_DIR}/include  
+    PUBLIC ${CMAKE_SOURCE_DIR}/src  
     PUBLIC ${RAYLIB_ROOT_DIR}/src/external
     PUBLIC ${ENET_ROOT_DIR}/include/
 )
