@@ -78,7 +78,7 @@ void Player::shoot() {
             dir.y /= len;
         }
 
-        bullets.emplace_back(position, dir, 10.0f, color);
+        bullets.emplace_back(position, dir, 10.0f, RED);
         timeSinceLastShot = 0.0f;
     }
 }
@@ -94,6 +94,10 @@ void Player::drawBullets() const {
 
 const std::vector<Bullet>& Player::getBullets() const {
     return bullets;
+}
+
+void Player::setBullets(const std::vector<Bullet>& newBullets) {
+    bullets = newBullets;
 }
 
 Position Player::getPosition() const {

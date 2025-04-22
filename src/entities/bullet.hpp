@@ -3,6 +3,9 @@
 
 #include <raylib.h>
 
+#include <cstdint>
+#include <vector>
+
 #include "entities/position.hpp"
 
 class Bullet {
@@ -13,6 +16,10 @@ class Bullet {
     void draw() const;
     bool isOffScreen() const;
     Position getPosition() const;
+
+    // Serialization and deserialization methods
+    std::vector<uint8_t> serialize() const;
+    static Bullet deserialize(const uint8_t* data, size_t& offset);
 
    private:
     Position position;

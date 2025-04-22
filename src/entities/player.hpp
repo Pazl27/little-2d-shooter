@@ -30,6 +30,7 @@ class Player : public Character {
     void updateBullets();
     void drawBullets() const;
     const std::vector<Bullet>& getBullets() const;
+    void setBullets(const std::vector<Bullet>& newBullets);
 
    protected:
     Position getInput();

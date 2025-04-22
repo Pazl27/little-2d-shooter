@@ -43,6 +43,7 @@ void Game::start() {
         int localIndex = isHost ? 0 : 1;
         int remoteIndex = isHost ? 1 : 0;
 
+        // === PLAYER MOVEMENT ===
         players[localIndex].move();
         Position localPos = players[localIndex].getPosition();
         network->sendPosition(localPos.x, localPos.y);
@@ -52,10 +53,20 @@ void Game::start() {
             players[remoteIndex].setPosition({static_cast<int>(rx), static_cast<int>(ry)});
         }
 
-        // === UPDATE BULLETS for both players ===
+        // === BULLET SYNCING ===
+        // Send local bullets
+        network->sendBullets(players[localIndex].getBullets());
+
+        // Receive remote bullets
+        std::vector<Bullet> remoteBullets;
+        if (network->receiveBullets(remoteBullets)) {
+            players[remoteIndex].setBullets(remoteBullets);
+        }
+
+        // === UPDATE BULLETS ===
         players[localIndex].updateBullets();
 
-        // === DRAW players (which also draws bullets) ===
+        // === DRAW PLAYERS AND BULLETS ===
         for (auto& player : players) {
             player.draw();
         }

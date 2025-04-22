@@ -1,5 +1,6 @@
 #include "network/network_manager.hpp"
 
+#include <cstring>
 #include <iostream>
 
 NetworkManager::NetworkManager(bool hostFlag) : isHost(hostFlag), host(nullptr), peer(nullptr) {}
@@ -60,6 +61,46 @@ bool NetworkManager::receivePosition(float& x, float& y) {
                 return true;
             }
             enet_packet_destroy(event.packet);
+        } else if (event.type == ENET_EVENT_TYPE_CONNECT) {
+            peer = event.peer;
+            std::cout << "Peer connected!" << std::endl;
+        }
+    }
+    return false;
+}
+
+void NetworkManager::sendBullets(const std::vector<Bullet>& bullets) {
+    std::vector<uint8_t> buffer;
+
+    for (const Bullet& bullet : bullets) {
+        std::vector<uint8_t> serializedBullet = bullet.serialize();
+        buffer.insert(buffer.end(), serializedBullet.begin(), serializedBullet.end());
+    }
+
+    ENetPacket* packet = enet_packet_create(buffer.data(), buffer.size(), ENET_PACKET_FLAG_RELIABLE);
+
+    if (isHost && peer) {
+        enet_peer_send(peer, 0, packet);
+    } else if (!isHost) {
+        enet_peer_send(peer, 0, packet);
+    }
+
+    enet_host_flush(host);
+}
+
+bool NetworkManager::receiveBullets(std::vector<Bullet>& bullets) {
+    ENetEvent event;
+    while (enet_host_service(host, &event, 0) > 0) {
+        if (event.type == ENET_EVENT_TYPE_RECEIVE) {
+            const uint8_t* data = event.packet->data;
+            size_t offset = 0;
+
+            while (offset < event.packet->dataLength) {
+                bullets.push_back(Bullet::deserialize(data, offset));
+            }
+
+            enet_packet_destroy(event.packet);
+            return true;
         } else if (event.type == ENET_EVENT_TYPE_CONNECT) {
             peer = event.peer;
             std::cout << "Peer connected!" << std::endl;
