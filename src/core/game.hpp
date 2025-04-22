@@ -5,10 +5,11 @@
 #include <vector>
 
 #include "../entities/player.hpp"
+#include "../network/network_manager.hpp"
 
 class Game {
    public:
-    Game();
+    Game(bool isHost);
     ~Game();
 
     void start();
@@ -18,6 +19,8 @@ class Game {
    private:
     bool isRunning;
     const std::string windowTitle = "2d-shooter";
+    bool isHost;
+    NetworkManager* network;
     std::vector<Player> players;
 };
 

@@ -52,3 +52,11 @@ Position Player::getInput() const {
     }
     return input;
 }
+
+Position Player::getPosition() const {
+    return position;
+}
+
+void Player::setPosition(Position newPos) {
+    position = newPos;
+}

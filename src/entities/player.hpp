@@ -24,6 +24,9 @@ class Player : public Character {
     void attack() override;
     void draw() override;
 
+    Position getPosition() const;
+    void setPosition(Position newPos);
+
    protected:
     Position getInput() const;
 
