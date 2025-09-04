@@ -17,6 +17,9 @@ class Game {
     void reset();
 
    private:
+    void checkBulletCollisions(int localIndex, int remoteIndex);
+    void drawHealth();
+
     bool isRunning;
     const std::string windowTitle = "2d-shooter";
     bool isHost;

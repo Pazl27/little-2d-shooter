@@ -18,6 +18,11 @@ Player::Player(int spd, Color clr, int rad, PlayerShape shp) {
     lastDirection = {0, -1};
     shootCooldown = 0.3f;
     timeSinceLastShot = shootCooldown;
+
+    // Initialize health
+    maxHealth = 100;
+    health = maxHealth;
+    healthChanged = false;
 }
 
 Player::~Player() {
@@ -25,6 +30,10 @@ Player::~Player() {
 }
 
 void Player::move() {
+    if (!isAlive()) {
+        return;  // Dead players cannot move
+    }
+
     timeSinceLastShot += GetFrameTime();
 
     Position input = getInput();
@@ -46,16 +55,24 @@ void Player::attack() {
 }
 
 void Player::draw() {
-    if (shape == PlayerShape::CIRCLE) {
-        DrawCircle(position.x, position.y, radius, color);
-    } else if (shape == PlayerShape::SQUARE) {
-        DrawRectangle(position.x - radius, position.y - radius, radius * 2, radius * 2, color);
+    if (isAlive()) {
+        if (shape == PlayerShape::CIRCLE) {
+            DrawCircle(position.x, position.y, radius, color);
+        } else if (shape == PlayerShape::SQUARE) {
+            DrawRectangle(position.x - radius, position.y - radius, radius * 2, radius * 2, color);
+        }
+        this->drawBullets();
     }
-    this->drawBullets();
+    // Dead players are not drawn at all - they become invisible
 }
 
 Position Player::getInput() {
     Position input = {0, 0};
+
+    if (!isAlive()) {
+        return input;  // Dead players cannot receive input
+    }
+
     if (IsKeyDown(KEY_W)) input.y = -1;
     if (IsKeyDown(KEY_S)) input.y = 1;
     if (IsKeyDown(KEY_A)) input.x = -1;
@@ -84,6 +101,11 @@ void Player::shoot() {
 }
 
 void Player::updateBullets() {
+    if (!isAlive()) {
+        bullets.clear();  // Clear all bullets when player dies
+        return;
+    }
+
     for (auto& b : bullets) b.update();
     bullets.erase(std::remove_if(bullets.begin(), bullets.end(), [](const Bullet& b) { return b.isOffScreen(); }), bullets.end());
 }
@@ -106,4 +128,48 @@ Position Player::getPosition() const {
 
 void Player::setPosition(Position newPos) {
     position = newPos;
+}
+
+int Player::getHealth() const {
+    return health;
+}
+
+void Player::setHealth(int newHealth) {
+    int oldHealth = health;
+    health = std::max(0, std::min(newHealth, maxHealth));
+    if (oldHealth != health) {
+        healthChanged = true;
+    }
+}
+
+void Player::takeDamage(int damage) {
+    int oldHealth = health;
+    health = std::max(0, health - damage);
+    if (oldHealth != health) {
+        healthChanged = true;
+    }
+}
+
+bool Player::isAlive() const {
+    return health > 0;
+}
+
+bool Player::isCollidingWith(const Bullet& bullet) const {
+    Position bulletPos = bullet.getPosition();
+    int dx = bulletPos.x - position.x;
+    int dy = bulletPos.y - position.y;
+    float distance = std::sqrt(dx * dx + dy * dy);
+    return distance <= (radius + 4);  // 4 is bullet radius
+}
+
+int Player::getRadius() const {
+    return radius;
+}
+
+bool Player::hasHealthChanged() const {
+    return healthChanged;
+}
+
+void Player::clearHealthChangeFlag() {
+    healthChanged = false;
 }

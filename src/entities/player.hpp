@@ -32,6 +32,18 @@ class Player : public Character {
     const std::vector<Bullet>& getBullets() const;
     void setBullets(const std::vector<Bullet>& newBullets);
 
+    // Health system
+    int getHealth() const;
+    void setHealth(int newHealth);
+    void takeDamage(int damage);
+    bool isAlive() const;
+    bool hasHealthChanged() const;
+    void clearHealthChangeFlag();
+
+    // Collision detection
+    bool isCollidingWith(const Bullet& bullet) const;
+    int getRadius() const;
+
    protected:
     Position getInput();
 
@@ -46,6 +58,11 @@ class Player : public Character {
     float timeSinceLastShot;
 
     std::vector<Bullet> bullets;
+
+    // Health properties
+    int health;
+    int maxHealth;
+    mutable bool healthChanged;
 };
 
 #endif

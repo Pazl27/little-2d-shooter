@@ -19,6 +19,18 @@ class NetworkManager {
     void sendBullets(const std::vector<Bullet>& bullets);
     bool receiveBullets(std::vector<Bullet>& bullets);
 
+    // Damage message system
+    void sendDamage(int damage);
+    bool receiveDamage(int& damage);
+
+    // Health synchronization for display
+    void sendHealth(int health);
+    bool receiveHealth(int& health);
+
+    // Reset synchronization
+    void sendReset();
+    bool receiveReset();
+
    private:
     bool isHost;
     ENetHost* host;

@@ -108,3 +108,95 @@ bool NetworkManager::receiveBullets(std::vector<Bullet>& bullets) {
     }
     return false;
 }
+
+void NetworkManager::sendDamage(int damage) {
+    ENetPacket* packet = enet_packet_create(&damage, sizeof(int), ENET_PACKET_FLAG_RELIABLE);
+
+    if (isHost && peer) {
+        enet_peer_send(peer, 1, packet);
+    } else if (!isHost) {
+        enet_peer_send(peer, 1, packet);
+    }
+
+    enet_host_flush(host);
+}
+
+bool NetworkManager::receiveDamage(int& damage) {
+    ENetEvent event;
+    while (enet_host_service(host, &event, 0) > 0) {
+        if (event.type == ENET_EVENT_TYPE_RECEIVE && event.channelID == 1) {
+            if (event.packet->dataLength == sizeof(int)) {
+                int* data = reinterpret_cast<int*>(event.packet->data);
+                damage = *data;
+                enet_packet_destroy(event.packet);
+                return true;
+            }
+            enet_packet_destroy(event.packet);
+        } else if (event.type == ENET_EVENT_TYPE_CONNECT) {
+            peer = event.peer;
+            std::cout << "Peer connected!" << std::endl;
+        }
+    }
+    return false;
+}
+
+void NetworkManager::sendHealth(int health) {
+    ENetPacket* packet = enet_packet_create(&health, sizeof(int), ENET_PACKET_FLAG_RELIABLE);
+
+    if (isHost && peer) {
+        enet_peer_send(peer, 2, packet);  // Use channel 2 for health
+    } else if (!isHost) {
+        enet_peer_send(peer, 2, packet);
+    }
+
+    enet_host_flush(host);
+}
+
+bool NetworkManager::receiveHealth(int& health) {
+    ENetEvent event;
+    while (enet_host_service(host, &event, 0) > 0) {
+        if (event.type == ENET_EVENT_TYPE_RECEIVE && event.channelID == 2) {
+            if (event.packet->dataLength == sizeof(int)) {
+                int* data = reinterpret_cast<int*>(event.packet->data);
+                health = *data;
+                enet_packet_destroy(event.packet);
+                return true;
+            }
+            enet_packet_destroy(event.packet);
+        } else if (event.type == ENET_EVENT_TYPE_CONNECT) {
+            peer = event.peer;
+            std::cout << "Peer connected!" << std::endl;
+        }
+    }
+    return false;
+}
+
+void NetworkManager::sendReset() {
+    int resetSignal = 1;
+    ENetPacket* packet = enet_packet_create(&resetSignal, sizeof(int), ENET_PACKET_FLAG_RELIABLE);
+
+    if (isHost && peer) {
+        enet_peer_send(peer, 3, packet);  // Use channel 3 for reset
+    } else if (!isHost) {
+        enet_peer_send(peer, 3, packet);
+    }
+
+    enet_host_flush(host);
+}
+
+bool NetworkManager::receiveReset() {
+    ENetEvent event;
+    while (enet_host_service(host, &event, 0) > 0) {
+        if (event.type == ENET_EVENT_TYPE_RECEIVE && event.channelID == 3) {
+            if (event.packet->dataLength == sizeof(int)) {
+                enet_packet_destroy(event.packet);
+                return true;
+            }
+            enet_packet_destroy(event.packet);
+        } else if (event.type == ENET_EVENT_TYPE_CONNECT) {
+            peer = event.peer;
+            std::cout << "Peer connected!" << std::endl;
+        }
+    }
+    return false;
+}
