@@ -16,6 +16,7 @@ class Game {
     void start();
     void stop();
     void reset();
+    void createRemotePlayer();
 
    private:
     void checkBulletCollisions(int localIndex, int remoteIndex);
@@ -24,6 +25,7 @@ class Game {
     bool isRunning;
     const std::string windowTitle = "2d-shooter";
     bool isHost;
+    bool remotePlayerConnected;
     NetworkManager* network;
     std::vector<Player> players;
     Map* gameMap;

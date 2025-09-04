@@ -31,6 +31,9 @@ class NetworkManager {
     void sendReset();
     bool receiveReset();
 
+    // Connection status
+    bool isConnected() const;
+
    private:
     bool isHost;
     ENetHost* host;

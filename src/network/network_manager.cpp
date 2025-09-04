@@ -140,6 +140,10 @@ bool NetworkManager::receiveDamage(int& damage) {
     return false;
 }
 
+bool NetworkManager::isConnected() const {
+    return peer != nullptr;
+}
+
 void NetworkManager::sendHealth(int health) {
     ENetPacket* packet = enet_packet_create(&health, sizeof(int), ENET_PACKET_FLAG_RELIABLE);
 
