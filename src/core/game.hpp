@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 
+#include "core/map.hpp"
 #include "entities/player.hpp"
 #include "network/network_manager.hpp"
 
@@ -25,6 +26,7 @@ class Game {
     bool isHost;
     NetworkManager* network;
     std::vector<Player> players;
+    Map* gameMap;
 };
 
 #endif

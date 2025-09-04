@@ -2,7 +2,6 @@
 
 #include <raylib.h>
 
-#include <iostream>
 #include <stdexcept>
 #include <string>
 
@@ -13,8 +12,12 @@ Game::Game(bool hostFlag) : isRunning(false), isHost(hostFlag) {
     InitWindow(Constants::SCREEN_WIDTH, Constants::SCREEN_HEIGHT, windowTitle.c_str());
     SetTargetFPS(60);
 
+    // Initialize the game map
+    gameMap = new Map();
+
     network = new NetworkManager(isHost);
     if (!network->init()) {
+        delete gameMap;
         CloseWindow();
         throw std::runtime_error("Failed to initialize network");
     }
@@ -26,10 +29,15 @@ Game::Game(bool hostFlag) : isRunning(false), isHost(hostFlag) {
         players.emplace_back(5, RED, 10, PlayerShape::CIRCLE);   // Client player
         players.emplace_back(5, BLUE, 10, PlayerShape::CIRCLE);  // Host placeholder
     }
+
+    // Set initial spawn positions (avoid center obstacle)
+    players[0].setPosition({Constants::SCREEN_WIDTH / 4, Constants::SCREEN_HEIGHT / 4});
+    players[1].setPosition({3 * Constants::SCREEN_WIDTH / 4, 3 * Constants::SCREEN_HEIGHT / 4});
 }
 
 Game::~Game() {
     delete network;
+    delete gameMap;
     players.clear();
     CloseWindow();
 }
@@ -45,7 +53,7 @@ void Game::start() {
         int remoteIndex = isHost ? 1 : 0;
 
         // === PLAYER MOVEMENT ===
-        players[localIndex].move();
+        players[localIndex].move(gameMap);
         Position localPos = players[localIndex].getPosition();
         network->sendPosition(localPos.x, localPos.y);
 
@@ -64,12 +72,9 @@ void Game::start() {
             players[remoteIndex].setBullets(remoteBullets);
         }
 
-        // === DAMAGE RECEIVING ===
-        // Check for incoming damage from remote player
-        int incomingDamage;
-        if (network->receiveDamage(incomingDamage)) {
-            players[localIndex].takeDamage(incomingDamage);
-        }
+        // === DAMAGE HANDLING ===
+        // All damage is handled locally through bullet collision detection
+        // No network damage messages needed
 
         // === RESET SYNCHRONIZATION ===
         // Check for incoming reset from remote player
@@ -78,7 +83,8 @@ void Game::start() {
         }
 
         // === UPDATE BULLETS ===
-        players[localIndex].updateBullets();
+        players[localIndex].updateBullets(gameMap);
+        players[remoteIndex].updateBullets(gameMap);
 
         // === COLLISION DETECTION ===
         checkBulletCollisions(localIndex, remoteIndex);
@@ -102,6 +108,9 @@ void Game::start() {
             players[remoteIndex].setHealth(remoteHealth);
             players[remoteIndex].clearHealthChangeFlag();  // Don't trigger another sync
         }
+
+        // === DRAW MAP ===
+        gameMap->draw();
 
         // === DRAW PLAYERS AND BULLETS ===
         for (auto& player : players) {
@@ -153,9 +162,9 @@ void Game::reset() {
     players[0].setBullets(emptyBullets);
     players[1].setBullets(emptyBullets);
 
-    // Reset positions
-    players[0].setPosition({Constants::SCREEN_WIDTH / 2 - 50, Constants::SCREEN_HEIGHT / 2});
-    players[1].setPosition({Constants::SCREEN_WIDTH / 2 + 50, Constants::SCREEN_HEIGHT / 2});
+    // Reset positions (avoid center obstacle)
+    players[0].setPosition({Constants::SCREEN_WIDTH / 4, Constants::SCREEN_HEIGHT / 4});
+    players[1].setPosition({3 * Constants::SCREEN_WIDTH / 4, 3 * Constants::SCREEN_HEIGHT / 4});
 }
 
 void Game::checkBulletCollisions(int localIndex, int remoteIndex) {
@@ -165,8 +174,7 @@ void Game::checkBulletCollisions(int localIndex, int remoteIndex) {
         if (players[remoteIndex].isCollidingWith(*it)) {
             // Apply damage immediately for instant visual feedback
             players[remoteIndex].takeDamage(10);
-            // Send damage to them for their own tracking
-            network->sendDamage(10);
+            // No need to send damage over network - collision is handled locally on both sides
             it = localBullets.erase(it);
         } else {
             ++it;

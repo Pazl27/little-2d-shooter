@@ -7,6 +7,7 @@
 #include <iostream>
 
 #include "core/constants.hpp"
+#include "core/map.hpp"
 
 Player::Player(int spd, Color clr, int rad, PlayerShape shp) {
     position = {Constants::SCREEN_WIDTH / 2, Constants::SCREEN_HEIGHT / 2};
@@ -44,6 +45,46 @@ void Player::move() {
 
     Position newPos = {position.x + input.x * speed, position.y + input.y * speed};
 
+    newPos.x = std::max(radius, std::min(newPos.x, Constants::SCREEN_WIDTH - radius));
+    newPos.y = std::max(radius, std::min(newPos.y, Constants::SCREEN_HEIGHT - radius));
+
+    position = newPos;
+}
+
+void Player::move(const Map* map) {
+    if (!isAlive()) {
+        return;  // Dead players cannot move
+    }
+
+    timeSinceLastShot += GetFrameTime();
+
+    Position input = getInput();
+
+    if (input.x != 0 || input.y != 0) {
+        lastDirection = input;
+    }
+
+    Position newPos = {position.x + input.x * speed, position.y + input.y * speed};
+
+    // Check collision with map obstacles before moving
+    if (map && map->isPlayerColliding(newPos, radius)) {
+        // Try moving only horizontally
+        Position horizontalPos = {position.x + input.x * speed, position.y};
+        if (!map->isPlayerColliding(horizontalPos, radius)) {
+            newPos = horizontalPos;
+        } else {
+            // Try moving only vertically
+            Position verticalPos = {position.x, position.y + input.y * speed};
+            if (!map->isPlayerColliding(verticalPos, radius)) {
+                newPos = verticalPos;
+            } else {
+                // Can't move in either direction, stay in place
+                newPos = position;
+            }
+        }
+    }
+
+    // Keep player within screen bounds
     newPos.x = std::max(radius, std::min(newPos.x, Constants::SCREEN_WIDTH - radius));
     newPos.y = std::max(radius, std::min(newPos.y, Constants::SCREEN_HEIGHT - radius));
 
@@ -108,6 +149,28 @@ void Player::updateBullets() {
 
     for (auto& b : bullets) b.update();
     bullets.erase(std::remove_if(bullets.begin(), bullets.end(), [](const Bullet& b) { return b.isOffScreen(); }), bullets.end());
+}
+
+void Player::updateBullets(const Map* map) {
+    if (!isAlive()) {
+        bullets.clear();  // Clear all bullets when player dies
+        return;
+    }
+
+    for (auto& b : bullets) b.update();
+
+    // Remove bullets that are off screen or hit obstacles
+    bullets.erase(std::remove_if(bullets.begin(), bullets.end(),
+                                 [map](const Bullet& b) {
+                                     if (b.isOffScreen()) {
+                                         return true;
+                                     }
+                                     if (map && map->isBulletColliding(b.getPosition(), 4)) {  // 4 is bullet radius
+                                         return true;
+                                     }
+                                     return false;
+                                 }),
+                  bullets.end());
 }
 
 void Player::drawBullets() const {

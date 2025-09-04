@@ -9,6 +9,9 @@
 #include "entities/character.hpp"
 #include "entities/position.hpp"
 
+// Forward declaration
+class Map;
+
 enum class PlayerShape {
     CIRCLE,
     SQUARE,
@@ -20,6 +23,7 @@ class Player : public Character {
     ~Player() override;
 
     void move() override;
+    void move(const Map* map);  // Overloaded move with collision detection
     void attack() override;
     void draw() override;
 
@@ -28,6 +32,7 @@ class Player : public Character {
 
     void shoot();
     void updateBullets();
+    void updateBullets(const Map* map);  // Overloaded updateBullets with collision detection
     void drawBullets() const;
     const std::vector<Bullet>& getBullets() const;
     void setBullets(const std::vector<Bullet>& newBullets);
