@@ -2,6 +2,7 @@
 
 #include <raylib.h>
 
+#include <cmath>
 #include <stdexcept>
 #include <string>
 
@@ -202,29 +203,98 @@ void Game::drawHealth() {
     int localIndex = isHost ? 0 : 1;
     int remoteIndex = isHost ? 1 : 0;
 
-    // Draw local player health with color based on health
     int localHealth = players[localIndex].getHealth();
-    Color localHealthColor = localHealth > 50 ? GREEN : (localHealth > 25 ? YELLOW : RED);
-    std::string localHealthText = "Your Health: " + std::to_string(localHealth) + "/100";
-    DrawText(localHealthText.c_str(), 10, 10, 20, localHealthColor);
-
-    // Draw enemy health with color based on health
     int remoteHealth = players[remoteIndex].getHealth();
-    Color remoteHealthColor = remoteHealth > 50 ? GREEN : (remoteHealth > 25 ? YELLOW : RED);
-    std::string remoteHealthText = "Enemy Health: " + std::to_string(remoteHealth) + "/100";
-    DrawText(remoteHealthText.c_str(), 10, 40, 20, remoteHealthColor);
 
-    // Draw health bars
-    int barWidth = 200;
-    int barHeight = 20;
+    // Health bar dimensions and constants
+    const int barWidth = 150;
+    const int barHeight = 12;
+    const int margin = 15;
+    const int fontSize = 14;
+    const int labelOffset = 18;
 
-    // Local player health bar
-    DrawRectangle(10, 70, barWidth, barHeight, DARKGRAY);
-    DrawRectangle(10, 70, (localHealth * barWidth) / 100, barHeight, localHealthColor);
-    DrawRectangleLines(10, 70, barWidth, barHeight, BLACK);
+    // Color based on health percentage
+    auto getHealthColor = [](int health) -> Color {
+        if (health > 70) return GREEN;
+        if (health > 40) return YELLOW;
+        if (health > 15) return ORANGE;
+        return RED;
+    };
 
-    // Enemy health bar
-    DrawRectangle(10, 100, barWidth, barHeight, DARKGRAY);
-    DrawRectangle(10, 100, (remoteHealth * barWidth) / 100, barHeight, remoteHealthColor);
-    DrawRectangleLines(10, 100, barWidth, barHeight, BLACK);
+    Color localHealthColor = getHealthColor(localHealth);
+    Color remoteHealthColor = getHealthColor(remoteHealth);
+
+    // === LOCAL PLAYER HEALTH (Bottom Left) ===
+    int localBarX = margin;
+    int localBarY = Constants::SCREEN_HEIGHT - 35;
+
+    // Background bar with subtle shadow
+    DrawRectangle(localBarX + 1, localBarY + 1, barWidth, barHeight, {20, 20, 20, 180});
+    DrawRectangle(localBarX, localBarY, barWidth, barHeight, {40, 40, 40, 220});
+
+    // Health fill with simple gradient effect
+    int healthWidth = (localHealth * (barWidth - 2)) / 100;
+    DrawRectangle(localBarX + 1, localBarY + 1, healthWidth, barHeight - 2, localHealthColor);
+    // Add a subtle highlight on top
+    Color highlightColor = {(unsigned char)std::min(255, localHealthColor.r + 40), (unsigned char)std::min(255, localHealthColor.g + 40),
+                            (unsigned char)std::min(255, localHealthColor.b + 40), 150};
+    DrawRectangle(localBarX + 1, localBarY + 1, healthWidth, 2, highlightColor);
+
+    // Border with highlight
+    DrawRectangleLines(localBarX, localBarY, barWidth, barHeight, WHITE);
+    DrawRectangleLines(localBarX + 1, localBarY + 1, barWidth - 2, barHeight - 2, {200, 200, 200, 100});
+
+    // Player label and health text
+    DrawText("YOU", localBarX, localBarY - labelOffset, fontSize, BLACK);
+    std::string localHealthText = std::to_string(localHealth) + "%";
+    int textWidth = MeasureText(localHealthText.c_str(), fontSize);
+    DrawText(localHealthText.c_str(), localBarX + barWidth - textWidth, localBarY - labelOffset, fontSize, BLACK);
+
+    // === ENEMY PLAYER HEALTH (Bottom Right) ===
+    int enemyBarX = Constants::SCREEN_WIDTH - barWidth - margin;
+    int enemyBarY = Constants::SCREEN_HEIGHT - 35;
+
+    // Background bar with subtle shadow
+    DrawRectangle(enemyBarX + 1, enemyBarY + 1, barWidth, barHeight, {20, 20, 20, 180});
+    DrawRectangle(enemyBarX, enemyBarY, barWidth, barHeight, {40, 40, 40, 220});
+
+    // Health fill with simple gradient effect
+    int enemyHealthWidth = (remoteHealth * (barWidth - 2)) / 100;
+    DrawRectangle(enemyBarX + 1, enemyBarY + 1, enemyHealthWidth, barHeight - 2, remoteHealthColor);
+    // Add a subtle highlight on top
+    Color enemyHighlightColor = {(unsigned char)std::min(255, remoteHealthColor.r + 40),
+                                 (unsigned char)std::min(255, remoteHealthColor.g + 40),
+                                 (unsigned char)std::min(255, remoteHealthColor.b + 40), 150};
+    DrawRectangle(enemyBarX + 1, enemyBarY + 1, enemyHealthWidth, 2, enemyHighlightColor);
+
+    // Border with highlight
+    DrawRectangleLines(enemyBarX, enemyBarY, barWidth, barHeight, WHITE);
+    DrawRectangleLines(enemyBarX + 1, enemyBarY + 1, barWidth - 2, barHeight - 2, {200, 200, 200, 100});
+
+    // Enemy label and health text
+    int enemyLabelWidth = MeasureText("ENEMY", fontSize);
+    DrawText("ENEMY", enemyBarX + barWidth - enemyLabelWidth, enemyBarY - labelOffset, fontSize, BLACK);
+    std::string remoteHealthText = std::to_string(remoteHealth) + "%";
+    DrawText(remoteHealthText.c_str(), enemyBarX, enemyBarY - labelOffset, fontSize, BLACK);
+
+    // === LOW HEALTH VISUAL EFFECTS ===
+    // Add warning indicators for critically low health
+    if (localHealth <= 25) {
+        // Pulsing red overlay for critically low health
+        float pulse = (sin(GetTime() * 8.0f) + 1.0f) / 2.0f;  // 0.0 to 1.0
+        Color pulseColor = {255, 0, 0, (unsigned char)(50 * pulse)};
+        DrawRectangle(localBarX - 2, localBarY - 2, barWidth + 4, barHeight + 4, pulseColor);
+
+        // Warning text
+        if ((int)(GetTime() * 2) % 2 == 0) {  // Blink every 0.5 seconds
+            DrawText("LOW HEALTH!", localBarX, localBarY + barHeight + 5, 12, RED);
+        }
+    }
+
+    if (remoteHealth <= 25) {
+        // Subtle glow for enemy low health
+        float pulse = (sin(GetTime() * 6.0f) + 1.0f) / 2.0f;
+        Color pulseColor = {255, 100, 0, (unsigned char)(30 * pulse)};
+        DrawRectangle(enemyBarX - 1, enemyBarY - 1, barWidth + 2, barHeight + 2, pulseColor);
+    }
 }
